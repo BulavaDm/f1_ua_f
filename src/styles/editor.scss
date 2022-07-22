@@ -1,0 +1,25 @@
+.ql-toolbar.ql-snow {
+    border: 1px solid #000000 !important;
+    border-radius: 10px 10px 0 0;
+}
+
+.ql-container.ql-snow {
+    border: 1px solid #000000 !important;
+    border-top: unset !important;
+    border-radius: 0 0 10px 10px;
+}
+
+.ql-container, .ql-toolbar {
+    font-family: 'Roboto Slab', sans-serif !important;
+}
+
+.quillWrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+.ql-container {
+    flex-grow: 1;
+}

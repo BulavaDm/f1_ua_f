@@ -1,0 +1,24 @@
+@import "./reset.scss";
+@import "./editor.scss";
+@import "./cropper.scss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Roboto Slab', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+}
+
+h5 {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
