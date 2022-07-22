@@ -27,7 +27,13 @@
             return {
                 content: ''
             }
-        }
+        },
+
+        watch: {
+            content(newContent) {
+                this.$emit('update', newContent);
+            }
+        },
     }
 </script>
 

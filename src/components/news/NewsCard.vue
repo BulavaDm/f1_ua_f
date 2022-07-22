@@ -9,6 +9,7 @@
         <div class="news-card__control">
             <app-text-btn
                 :text="'Переглянути'"
+                @action="selectNews"
             />
             <div class="news-card__update">
                 <app-text-btn
@@ -29,7 +30,7 @@
 
         props: {
             id: {
-                type: Number,
+                type: String,
                 required: true
             },
             title: {
@@ -45,6 +46,10 @@
         methods: {
             deleteNews() {
                 this.$emit('delete', this.id);
+            },
+
+            selectNews() {
+                this.$emit('select', this.id);
             }
         }
     }
@@ -59,6 +64,8 @@
         background: #FFFFFF;
 
         &__image {
+            min-height: 235px;
+
             img {
                 height: 235px;
                 width: 100%;

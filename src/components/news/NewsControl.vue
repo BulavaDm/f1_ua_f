@@ -22,7 +22,7 @@
             </div>
             <div class="news__text">
                 <app-text-editor
-
+                    @update="updateNewsContent"
                 />
             </div>
             <div class="news__control">
@@ -44,7 +44,16 @@
                 <div class="news__label">
                     Мобільне відображення
                 </div>
-                <div class="news__mobile"></div>
+                <div class="news__mobile" ref="newsMobile">
+                    <div class="news__mobile-view" :style="{ 'maxHeight': maxHeight.mobile }">
+                        <div v-if="isOneNewsExist" class="news__selected-news">
+                            <news-mobile-view
+                                :image="selectedNews.image"
+                                :content="selectedNews.content"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="news__all">
                 <div class="news__label">
@@ -52,13 +61,14 @@
                 </div>
                 <div class="news__news" ref="newsList">
                     <div v-if="!isLoaded" class="news__wrapper" :style="{ 'maxHeight': maxHeight.list }">
-                        <div v-for="(news, id) in allNews" class="news__card">
+                        <div v-for="news in allNews" :key="news.id" class="news__card">
                             <news-card
-                                :id="id"
+                                :id="news.id"
                                 :title="news.title"
                                 :image="news.image"
                                 :content="news.content"
                                 @delete="deleteNews"
+                                @select="selectNews"
                             />
                         </div>
                     </div>
@@ -70,6 +80,7 @@
 
 <script>
     import NewsCard from "./NewsCard";
+    import NewsMobileView from "./NewsMobileView";
     import { generateTemporaryId } from "../../helpers/common";
     import { getDatabase, child, set, get, ref as dRef, remove } from "firebase/database";
     import { getStorage, getDownloadURL, uploadBytes, ref as sRef, deleteObject } from "firebase/storage";
@@ -78,6 +89,7 @@
         name: "NewsControl",
 
         components: {
+            NewsMobileView,
             NewsCard
         },
 
@@ -85,21 +97,34 @@
             return {
                 news: {
                     title: '',
-                    file: ''
+                    file: '',
+                    content: ''
                 },
+                selectedNews: null,
 
                 isLoaded: false,
 
                 allNews: null,
 
                 maxHeight: {
-                    list: ''
+                    list: '',
+                    mobile: ''
                 }
             }
         },
 
         created() {
             this.getAllNews();
+        },
+
+        mounted() {
+            this.calculateMaxHeight();
+        },
+
+        computed: {
+            isOneNewsExist() {
+                return !!this.allNews.length;
+            }
         },
 
         methods: {
@@ -112,8 +137,15 @@
                 get(child(dbRef, 'news'))
                     .then((snapshot) => {
                         if (snapshot.exists()) {
-                            this.calculateMaxHeight();
-                            this.allNews = snapshot.val();
+                            const newsKeys = Object.keys(snapshot.val());
+
+                            this.allNews = newsKeys.sort(this.sortAllNews).map((key) => {
+                                const news = snapshot.val()[key];
+                                news.id = key;
+                                return news;
+                            });
+
+                            this.selectedNews = this.allNews[0];
                         }
                     })
                     .finally(() => {
@@ -121,8 +153,13 @@
                     })
             },
 
+            sortAllNews(a, b) {
+                return a < b ? 1 : a > b ? -1 : 0;
+            },
+
             calculateMaxHeight() {
                 this.maxHeight.list = `${this.$refs.newsList.offsetHeight}px`;
+                this.maxHeight.mobile = `${this.$refs.newsMobile.offsetHeight - 30}px`;
             },
 
             updateNewsTitle(title) {
@@ -131,6 +168,10 @@
 
             updateNewsImage(image) {
                 this.news.file = image.file;
+            },
+
+            updateNewsContent(content) {
+                this.news.content = content;
             },
 
             createNews() {
@@ -145,6 +186,7 @@
                             .then((url) => {
                                 set(dRef(db, `news/${id}`), {
                                     title: this.news.title,
+                                    content: this.news.content,
                                     image: url
                                 })
                                 .then(() => {
@@ -173,6 +215,10 @@
 
             clearNews() {
                 Object.keys(this.news).forEach((key) => this.news[key] = '');
+            },
+
+            selectNews(id) {
+                this.selectedNews = this.allNews.find((news) => news.id === id);
             }
         }
     }
@@ -204,13 +250,15 @@
 
         &__preview {
             padding-right: 30px;
+            display: flex;
         }
 
         &__mobile {
-            height: 100%;
             border: 1px solid #000000;
             border-radius: 10px;
             background: #FFFFFF;
+            flex-grow: 1;
+            padding: 10px;
         }
 
         &__news {
@@ -269,10 +317,10 @@
             margin-bottom: 8px;
         }
 
-        &__wrapper {
+        &__wrapper, &__mobile-view {
             height: 100%;
             overflow-y: auto;
-            scrollbar-width: thin;
+            scrollbar-width: none;
         }
     }
 </style>

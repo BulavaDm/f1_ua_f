@@ -19,6 +19,16 @@ h5 {
     font-weight: 500;
 }
 
+em {
+  font-style: italic;
+}
+
+blockquote {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid #000000;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }
