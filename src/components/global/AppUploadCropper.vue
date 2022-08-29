@@ -70,6 +70,10 @@
             label: {
                 type: String,
                 default: ''
+            },
+            isNotMain: {
+                type: Boolean,
+                default: false
             }
         },
 
@@ -77,13 +81,20 @@
             return {
                 image: {
                     isUploaded: false,
-                    isCropped: false,
                     url: '',
                     base64: '',
                     file: '',
                     isChanged: false
                 }
             }
+        },
+
+        mounted() {
+            this.subscribeToEvents();
+        },
+
+        unmounted() {
+            this.unsubscribeFromEvents();
         },
 
         computed: {
@@ -93,6 +104,16 @@
         },
 
         methods: {
+            subscribeToEvents() {
+                this.emitter.on('clearFields', this.clearUploadFile);
+                this.emitter.on('updateImage', this.updateImage);
+            },
+
+            unsubscribeFromEvents() {
+                this.emitter.off('clearFields', this.clearUploadFile);
+                this.emitter.off('updateImage', this.updateImage);
+            },
+
             async uploadFile(event) {
                 const file = event.target.files[0];
 
@@ -159,6 +180,13 @@
                     });
                 });
             },
+
+            updateImage(image) {
+                if (!this.isNotMain) {
+                    this.image.url = image;
+                    this.image.isUploaded = true;
+                }
+            }
         }
     }
 </script>

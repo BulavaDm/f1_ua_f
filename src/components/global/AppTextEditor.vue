@@ -29,11 +29,39 @@
             }
         },
 
+        mounted() {
+            this.subscribeToEvents();
+        },
+
+        unmounted() {
+            this.unsubscribeFromEvents();
+        },
+
         watch: {
             content(newContent) {
                 this.$emit('update', newContent);
             }
         },
+
+        methods: {
+            subscribeToEvents() {
+                this.emitter.on('clearFields', this.clearContent);
+                this.emitter.on('updateContent', this.updateContent);
+            },
+
+            unsubscribeFromEvents() {
+                this.emitter.off('clearFields', this.clearContent);
+                this.emitter.off('updateContent', this.updateContent);
+            },
+
+            clearContent() {
+                this.content = '';
+            },
+
+            updateContent(content) {
+                this.content = content;
+            }
+        }
     }
 </script>
 

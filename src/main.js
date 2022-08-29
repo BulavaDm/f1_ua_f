@@ -4,6 +4,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import "./config/firebase"
+import mitt from 'mitt'
+const emitter = mitt()
 
 import AppControlBtn from "./components/global/AppControlBtn";
 import AppTextBtn from "./components/global/AppTextBtn";
@@ -12,6 +14,7 @@ import AppTextEditor from "./components/global/AppTextEditor";
 import AppUploadCropper from "./components/global/AppUploadCropper";
 
 const app = createApp(App)
+app.config.globalProperties.emitter = emitter
 
 app.component('app-control-btn', AppControlBtn);
 app.component('app-text-btn', AppTextBtn);

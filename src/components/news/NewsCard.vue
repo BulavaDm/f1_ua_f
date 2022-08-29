@@ -14,6 +14,7 @@
             <div class="news-card__update">
                 <app-text-btn
                     :text="'Редагувати'"
+                    @action="updateNews"
                 />
                 <app-text-btn
                     :text="'Видалити'"
@@ -50,6 +51,10 @@
 
             selectNews() {
                 this.$emit('select', this.id);
+            },
+
+            updateNews() {
+                this.$emit('update', this.id);
             }
         }
     }

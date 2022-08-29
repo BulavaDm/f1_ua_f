@@ -16,6 +16,7 @@
                 </div>
                 <div class="news__cropper">
                     <app-upload-cropper
+                        :is-not-main="true"
                         :label="'Для обробки додаткових зображень'"
                     />
                 </div>
@@ -29,12 +30,13 @@
                 <div class="news__control-btn">
                     <app-control-btn
                         :text="'Очистити'"
+                        @action="clearNews"
                     />
                 </div>
                 <div class="news__control-btn">
                     <app-control-btn
-                        :text="'Створити'"
-                        @action="createNews"
+                        :text="isUpdate ? 'Зберегти' : 'Створити'"
+                        @action="doActionNews"
                     />
                 </div>
             </div>
@@ -69,6 +71,7 @@
                                 :content="news.content"
                                 @delete="deleteNews"
                                 @select="selectNews"
+                                @update="updateNews"
                             />
                         </div>
                     </div>
@@ -82,7 +85,7 @@
     import NewsCard from "./NewsCard";
     import NewsMobileView from "./NewsMobileView";
     import { generateTemporaryId } from "../../helpers/common";
-    import { getDatabase, child, set, get, ref as dRef, remove } from "firebase/database";
+    import { getDatabase, child, set, get, update, ref as dRef, remove } from "firebase/database";
     import { getStorage, getDownloadURL, uploadBytes, ref as sRef, deleteObject } from "firebase/storage";
 
     export default {
@@ -103,6 +106,7 @@
                 selectedNews: null,
 
                 isLoaded: false,
+                isUpdate: false,
 
                 allNews: null,
 
@@ -174,6 +178,14 @@
                 this.news.content = content;
             },
 
+            doActionNews() {
+                if (!this.isUpdate) {
+                    this.createNews();
+                } else {
+                    this.changeNews();
+                }
+            },
+
             createNews() {
                 const id = generateTemporaryId();
                 const db = getDatabase();
@@ -195,7 +207,40 @@
                                 });
                             })
                     });
+            },
 
+            changeNews() {
+                const id = this.news.id;
+                const db = getDatabase();
+                const storage = getStorage();
+                const storageRef = sRef(storage, `news/${id}`);
+
+                if (this.news.file) {
+                    uploadBytes(storageRef, this.news.file)
+                        .then(() => {
+                            getDownloadURL(storageRef)
+                                .then((url) => {
+                                    update(dRef(db, `news/${id}`), {
+                                        title: this.news.title,
+                                        content: this.news.content,
+                                        image: url
+                                    })
+                                        .then(() => {
+                                            this.getAllNews();
+                                            this.clearNews();
+                                        });
+                                })
+                        });
+                } else {
+                    update(dRef(db, `news/${id}`), {
+                        title: this.news.title,
+                        content: this.news.content,
+                    })
+                        .then(() => {
+                            this.getAllNews();
+                            this.clearNews();
+                        });
+                }
             },
 
             deleteNews(id) {
@@ -214,11 +259,21 @@
             },
 
             clearNews() {
-                Object.keys(this.news).forEach((key) => this.news[key] = '');
+                this.news.title = '';
+                this.emitter.emit('clearFields');
+                this.isUpdate = false;
             },
 
             selectNews(id) {
                 this.selectedNews = this.allNews.find((news) => news.id === id);
+            },
+
+            updateNews(id) {
+                const selectedNews = this.allNews.find((news) => news.id === id);
+                this.news = { ...selectedNews };
+                this.emitter.emit('updateContent', this.news.content);
+                this.emitter.emit('updateImage', this.news.image);
+                this.isUpdate = true;
             }
         }
     }

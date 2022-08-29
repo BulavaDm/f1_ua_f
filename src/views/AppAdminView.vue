@@ -8,6 +8,7 @@
                     />
                 </router-link>
             </div>
+<!--            <button type="button" @click="signOut">Out</button>-->
         </nav>
         <main class="admin-view__content">
             <router-view/>
@@ -17,6 +18,7 @@
 
 <script>
     import { menuItems } from "../constants/menu";
+    import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from "firebase/auth";
 
     export default {
         name: "AppAdminView",
@@ -31,9 +33,51 @@
             }
         },
 
+        created() {
+            const auth = getAuth();
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log(user);
+                } else {
+                    const provider = new GoogleAuthProvider();
+                    signInWithPopup(auth, provider)
+                        .then((result) => {
+                            console.log(result);
+                            // This gives you a Google Access Token. You can use it to access the Google API.
+                            const credential = GoogleAuthProvider.credentialFromResult(result);
+                            const token = credential.accessToken;
+                            // The signed-in user info.
+                            const user = result.user;
+                            // ...
+                        }).catch((error) => {
+                        console.log(error);
+                        // Handle Errors here.
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        // The email of the user's account used.
+                        const email = error.customData.email;
+                        // The AuthCredential type that was used.
+                        const credential = GoogleAuthProvider.credentialFromError(error);
+                        // ...
+                    });
+                }
+            })
+        },
+
         computed: {
             items() {
                 return menuItems;
+            }
+        },
+
+        methods: {
+            signOut() {
+                const auth = getAuth();
+                signOut(auth).then(() => {
+                    // Sign-out successful.
+                }).catch((error) => {
+                    // An error happened.
+                });
             }
         }
     }
