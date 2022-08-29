@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppAdminView from "../views/AppAdminView";
 import NewsControl from "../components/news/NewsControl";
+import RacesControl from "../components/races/RacesControl";
 
 const routes = [
     {
@@ -11,6 +12,10 @@ const routes = [
             {
               path: 'news',
               component: NewsControl
+            },
+            {
+                path: 'races',
+                component: RacesControl
             }
         ]
     }

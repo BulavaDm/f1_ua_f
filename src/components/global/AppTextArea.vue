@@ -1,7 +1,7 @@
 <template>
     <div class="text-area">
         <div class="text-area__label">
-            Заголовок
+            {{ label }}
         </div>
         <textarea
            :value="modelValue"
@@ -19,6 +19,10 @@
                 type: String,
                 required: true
             },
+            label: {
+                type: String,
+                required: true
+            }
         },
 
         emits: ['update:modelValue']

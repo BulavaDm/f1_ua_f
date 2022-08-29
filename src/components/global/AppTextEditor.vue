@@ -1,7 +1,7 @@
 <template>
     <div class="text-editor">
         <div class="text-editor__label">
-            Наповнення новини
+            {{ label }}
         </div>
         <div class="text-editor__editor">
             <vue-editor
@@ -21,6 +21,13 @@
 
         components: {
             VueEditor
+        },
+
+        props: {
+            label: {
+                type: String,
+                required: true
+            }
         },
 
         data() {

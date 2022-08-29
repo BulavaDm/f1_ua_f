@@ -4,6 +4,7 @@
             <div class="news__title">
                 <app-text-area
                     v-model="news.title"
+                    :label="'Заголовок'"
                     @update="updateNewsTitle"
                 />
             </div>
@@ -23,6 +24,7 @@
             </div>
             <div class="news__text">
                 <app-text-editor
+                    :label="'Наповнення новини'"
                     @update="updateNewsContent"
                 />
             </div>

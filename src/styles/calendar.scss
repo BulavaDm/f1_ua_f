@@ -1,0 +1,34 @@
+.vc-highlight {
+  background-color: #C1CFEA !important;
+  border-radius: 50% !important;
+}
+
+.vc-day-content {
+  font-weight: unset;
+}
+
+.vc-day-content:hover {
+  background: #C1CFEA;
+}
+
+.vc-day {
+  span {
+    font-weight: unset !important;
+    font-family: 'Roboto Slab', sans-serif !important;
+  }
+}
+
+.vc-weekday {
+  color: #C1CFEA;;
+  font-size: 14px;
+  font-weight: unset;
+  font-family: 'Roboto Slab', sans-serif
+}
+
+.vc-title {
+  color: #C1CFEA;;
+  font-weight: unset;
+  font-family: 'Roboto Slab', sans-serif;
+  font-size: 20px;
+  pointer-events: none;
+}
