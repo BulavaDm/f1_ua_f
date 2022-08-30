@@ -33,7 +33,7 @@
                         :stencil-component="stencilComponent"
                         :stencil-props="{
                             previewClass: 'preview',
-                            aspectRatio: 16/9
+                            aspectRatio: aspectRatio
                         }"
                         @change="resizeUploadedFile"
                     />
@@ -74,6 +74,10 @@
             isNotMain: {
                 type: Boolean,
                 default: false
+            },
+            aspectRatio: {
+                type: Number,
+                default: 16/9
             }
         },
 
@@ -105,12 +109,12 @@
 
         methods: {
             subscribeToEvents() {
-                this.emitter.on('clearFields', this.clearUploadFile);
+                this.emitter.on('clearImage', this.clearUploadFile);
                 this.emitter.on('updateImage', this.updateImage);
             },
 
             unsubscribeFromEvents() {
-                this.emitter.off('clearFields', this.clearUploadFile);
+                this.emitter.off('clearImage', this.clearUploadFile);
                 this.emitter.off('updateImage', this.updateImage);
             },
 

@@ -262,7 +262,7 @@
 
             clearNews() {
                 this.news.title = '';
-                this.emitter.emit('clearFields');
+                this.emitter.emit('clearImage');
                 this.isUpdate = false;
             },
 
