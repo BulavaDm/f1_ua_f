@@ -78,18 +78,17 @@
         border: 1px solid #000000;
         border-radius: 10px;
         background: #FFFFFF;
-        padding: 10px;
 
         &__info {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
+            background: #C1CFEA;
+            border-radius: 10px 10px 0 0;
         }
 
         &__image {
-            border: 1px solid #000000;
-            border-radius: 10px;
-            height: 52px;
+            height: 50px;
             min-width: 64px;
             margin-right: 10px;
 
@@ -98,26 +97,29 @@
                 width: 100%;
                 max-width: 100%;
                 object-fit: cover;
-                border-radius: 10px;
+                border-radius: 10px 0 0 0 ;
             }
         }
 
         &__details {
             display: flex;
             flex-direction: column;
+            background: #C1CFEA;
         }
 
         &__date {
             margin-bottom: 4px;
         }
 
-        &__name {
-
+        &__date, &__name {
+            font-size: 16px;
+            line-height: 16px;
         }
 
         &__control {
             display: flex;
             justify-content: space-between;
+            padding: 10px;
         }
 
         &__update {

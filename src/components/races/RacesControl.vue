@@ -19,12 +19,14 @@
                     <div class="races__date">
                         <app-date-time-picker
                             :label="'Початок'"
+                            :date-time="race.startDate"
                             @update="updateStartDate"
                         />
                     </div>
                     <div class="races__date">
                         <app-date-time-picker
                             :label="'Закінчення'"
+                            :date-time="race.endDate"
                             @update="updateEndDate"
                         />
                     </div>
@@ -53,7 +55,7 @@
                 <div class="races__control-btn">
                     <app-control-btn
                         :text="'Очистити'"
-                        @action="clearRace"
+                        @action="clearAllRace"
                     />
                 </div>
                 <div class="races__control-btn">
@@ -70,14 +72,16 @@
                     Мобільне відображення
                 </div>
                 <div class="races__mobile" ref="racesMobile">
-                    <!--                <div class="news__mobile-view" :style="{ 'maxHeight': maxHeight.mobile }">-->
-                    <!--                    <div v-if="isOneNewsExist" class="news__selected-news">-->
-                    <!--                        <news-mobile-view-->
-                    <!--                                :image="selectedNews.image"-->
-                    <!--                                :content="selectedNews.content"-->
-                    <!--                        />-->
-                    <!--                    </div>-->
-                    <!--                </div>-->
+                    <div class="races__mobile-view" :style="{ 'maxHeight': maxHeight.mobile }">
+                        <div v-if="isOneRaceExist" class="races__selected-race">
+                            <race-mobile-view
+                                :image="selectedRace.image"
+                                :name="selectedRace.name"
+                                :date="selectedRace.formattedDate"
+                                :events="selectedRace.events"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="races__all">
@@ -107,8 +111,10 @@
 <script>
     import RaceEventDayRow from "./RaceEventDayRow";
     import RaceCard from "./RaceCard";
+    import RaceMobileView from "./RaceMobileView";
+    import cloneDeep from "lodash.clonedeep";
     import { generateTemporaryId } from "../../helpers/common";
-    import { child, get, getDatabase, ref as dRef, remove, set } from "firebase/database";
+    import { child, get, getDatabase, ref as dRef, remove, set, update } from "firebase/database";
     import { getDownloadURL, getStorage, uploadBytes, ref as sRef, deleteObject } from "firebase/storage";
     import { formatStartAndEndDate, formatStartDate, formatDateToTime } from "../../helpers/date";
 
@@ -116,6 +122,7 @@
         name: "RacesControl",
 
         components: {
+            RaceMobileView,
             RaceCard,
             RaceEventDayRow
         },
@@ -151,6 +158,12 @@
             this.calculateMaxHeight();
         },
 
+        computed: {
+            isOneRaceExist() {
+                return !!this.races.length;
+            }
+        },
+
         methods: {
             getAllRaces() {
                 this.races = [];
@@ -169,8 +182,6 @@
                                 return race;
                             });
 
-                            console.log(this.races);
-
                             this.selectedRace = this.races[0];
                         }
                     })
@@ -180,20 +191,20 @@
             },
 
             sortAllRaces(a, b) {
-                return a < b ? 1 : a > b ? -1 : 0;
+                return a < b ? -1 : a > b ? 1 : 0;
             },
 
             calculateMaxHeight() {
                 this.maxHeight.events = `${this.$refs.raceEvents.offsetHeight - 40}px `;
                 this.maxHeight.list = `${this.$refs.racesList.offsetHeight}px`;
-                // this.maxHeight.mobile = `${this.$refs.raceMobile.offsetHeight - 30}px`;
+                this.maxHeight.mobile = `${this.$refs.racesMobile.offsetHeight - 30}px`;
             },
 
             doActionRace() {
                 if (!this.isUpdate) {
                     this.createRace();
                 } else {
-                    // this.changeRace();
+                    this.changeRace();
                 }
             },
 
@@ -221,7 +232,7 @@
                                 })
                                     .then(() => {
                                         this.getAllRaces();
-                                        this.clearRace();
+                                        this.clearAllRace();
                                     });
                             })
                     });
@@ -243,6 +254,50 @@
                         })
                     }
                 })
+            },
+
+            changeRace() {
+                this.emitter.emit('updateDateTime');
+                this.emitter.emit('updateTimeEvent');
+                this.emitter.emit('updateEvent');
+
+                const id = this.race.id;
+                const db = getDatabase();
+                const storage = getStorage();
+                const storageRef = sRef(storage, `races/${id}`);
+
+                if (this.race.file) {
+                    uploadBytes(storageRef, this.race.file)
+                        .then(() => {
+                            getDownloadURL(storageRef)
+                                .then((url) => {
+                                    update(dRef(db, `races/${id}`), {
+                                        image: url,
+                                        name: this.race.name,
+                                        startDate: this.race.startDate,
+                                        endDate: this.race.endDate,
+                                        formattedDate: formatStartAndEndDate(this.race.startDate, this.race.endDate),
+                                        events: this.mapEventsToSend(this.race.events)
+                                    })
+                                        .then(() => {
+                                            this.getAllRaces();
+                                            this.clearAllRace();
+                                        });
+                                })
+                        });
+                } else {
+                    update(dRef(db, `races/${id}`), {
+                        name: this.race.name,
+                        startDate: this.race.startDate,
+                        endDate: this.race.endDate,
+                        formattedDate: formatStartAndEndDate(this.race.startDate, this.race.endDate),
+                        events: this.mapEventsToSend(this.race.events)
+                    })
+                        .then(() => {
+                            this.getAllRaces();
+                            this.clearAllRace();
+                        });
+                }
             },
 
             updateRaceImage(image) {
@@ -278,11 +333,13 @@
                 this.race.events = this.race.events.filter((event) => event.id !== id);
             },
 
-            clearRace() {
+            clearAllRace() {
                 this.race.name = '';
+                this.race.file = '';
+                this.race.events = [];
                 this.emitter.emit('clearImage');
                 this.emitter.emit('clearDateTime');
-                this.emitter.emit('clearEvent');
+                this.isUpdate = false;
             },
 
             deleteRace(id) {
@@ -305,11 +362,11 @@
             },
 
             updateRace(id) {
-                // const selectedNews = this.allNews.find((news) => news.id === id);
-                // this.news = { ...selectedNews };
-                // this.emitter.emit('updateContent', this.news.content);
-                // this.emitter.emit('updateImage', this.news.image);
-                // this.isUpdate = true;
+                const selectedRace = this.races.find((race) => race.id === id);
+                this.race = cloneDeep(selectedRace);
+                this.race.file = '';
+                this.emitter.emit('updateImage', this.race.image);
+                this.isUpdate = true;
             }
         }
     }

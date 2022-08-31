@@ -3,6 +3,7 @@
         <div class="race-day-event__day">
             <app-date-time-picker
                 :label="'Дата дня подій'"
+                :date-time="event.date"
                 @update="selectDateTime"
             />
         </div>
@@ -66,6 +67,10 @@
             }
         },
 
+        created() {
+            this.init();
+        },
+
         mounted() {
             this.subscribeToEvents();
         },
@@ -76,13 +81,17 @@
 
         methods: {
             subscribeToEvents() {
-                this.emitter.on('clearEvent', this.clearEvent);
                 this.emitter.on('updateEvent', this.updateEvent);
             },
 
             unsubscribeFromEvents() {
-                this.emitter.off('clearEvent', this.clearEvent);
                 this.emitter.off('updateEvent', this.updateEvent);
+            },
+
+            init() {
+                this.event.name = this.name;
+                this.event.date = this.date;
+                this.event.timeEvents = this.timeEvents;
             },
 
             selectDateTime(date) {
@@ -91,11 +100,6 @@
 
             deleteEvent() {
                 this.$emit('delete', this.id);
-            },
-
-            clearEvent() {
-                this.event.name = '';
-                this.event.dateTime = '';
             },
 
             updateEvent() {

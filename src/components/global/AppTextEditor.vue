@@ -52,12 +52,12 @@
 
         methods: {
             subscribeToEvents() {
-                this.emitter.on('clearFields', this.clearContent);
+                this.emitter.on('clearContent', this.clearContent);
                 this.emitter.on('updateContent', this.updateContent);
             },
 
             unsubscribeFromEvents() {
-                this.emitter.off('clearFields', this.clearContent);
+                this.emitter.off('clearContent', this.clearContent);
                 this.emitter.off('updateContent', this.updateContent);
             },
 

@@ -85,10 +85,11 @@
             return {
                 image: {
                     isUploaded: false,
+                    isUpdate: false,
+                    isChanged: false,
                     url: '',
                     base64: '',
-                    file: '',
-                    isChanged: false
+                    file: ''
                 }
             }
         },
@@ -109,12 +110,12 @@
 
         methods: {
             subscribeToEvents() {
-                this.emitter.on('clearImage', this.clearUploadFile);
+                this.emitter.on('clearImage', this.clearImage);
                 this.emitter.on('updateImage', this.updateImage);
             },
 
             unsubscribeFromEvents() {
-                this.emitter.off('clearImage', this.clearUploadFile);
+                this.emitter.off('clearImage', this.clearImage);
                 this.emitter.off('updateImage', this.updateImage);
             },
 
@@ -142,11 +143,21 @@
                 });
             },
 
+            clearImage() {
+                this.clearUploadFile();
+                this.image.isUpdate = false;
+                this.image.isChanged = false;
+            },
+
             clearUploadFile() {
                 this.image.url = '';
                 this.image.base64 = '';
                 this.image.file = '';
                 this.image.isUploaded = false;
+
+                if (this.image.isUpdate) {
+                    this.image.isChanged = true;
+                }
             },
 
             downloadUploadFile() {
@@ -160,21 +171,23 @@
             },
 
             resizeUploadedFile() {
-                const { canvas } = this.$refs.cropper.getResult();
-                this.image.base64 = canvas.toDataURL();
+                if (!this.image.isUpdate || this.image.isChanged) {
+                    const { canvas } = this.$refs.cropper.getResult();
+                    this.image.base64 = canvas.toDataURL();
 
-                this.canvasToBlob(canvas)
-                    .then(blob => {
-                        const fileName = blob.type.split('/').join('.');
+                    this.canvasToBlob(canvas)
+                        .then(blob => {
+                            const fileName = blob.type.split('/').join('.');
 
-                        this.image.file = new File([ blob ], `${fileName}`, {
-                            type: blob.type,
-                        });
+                            this.image.file = new File([ blob ], `${fileName}`, {
+                                type: blob.type,
+                            });
 
-                        this.$emit('update', {
-                            file: this.image.file,
-                        });
-                    })
+                            this.$emit('update', {
+                                file: this.image.file,
+                            });
+                        })
+                }
             },
 
             canvasToBlob(canvas) {
@@ -189,6 +202,7 @@
                 if (!this.isNotMain) {
                     this.image.url = image;
                     this.image.isUploaded = true;
+                    this.image.isUpdate = true;
                 }
             }
         }

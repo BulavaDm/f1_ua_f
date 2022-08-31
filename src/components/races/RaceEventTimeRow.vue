@@ -11,6 +11,7 @@
                 <app-date-time-picker
                     :label="'Час події'"
                     :mode="'time'"
+                    :date-time="timeEvent.dateTime"
                     @update="selectDateTime"
                 />
             </div>
@@ -53,6 +54,10 @@
             }
         },
 
+        created() {
+            this.init();
+        },
+
         mounted() {
             this.subscribeToEvents();
         },
@@ -63,18 +68,16 @@
 
         methods: {
             subscribeToEvents() {
-                this.emitter.on('clearEvent', this.clearEvent);
                 this.emitter.on('updateTimeEvent', this.updateTimeEvent);
             },
 
             unsubscribeFromEvents() {
-                this.emitter.off('clearEvent', this.clearEvent);
                 this.emitter.off('updateTimeEvent', this.updateTimeEvent);
             },
 
-            clearEvent() {
-                this.timeEvent.name = '';
-                this.timeEvent.dateTime = '';
+            init() {
+                this.timeEvent.name = this.name;
+                this.timeEvent.dateTime = this.dateTime;
             },
 
             selectDateTime(dateTime) {

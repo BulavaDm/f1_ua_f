@@ -43,6 +43,10 @@
             mode: {
                 type: String,
                 default: 'date'
+            },
+            dateTime: {
+                type: [ Number, String ],
+                required: true
             }
         },
 
@@ -76,12 +80,20 @@
             date() {
                 const date = this.date ? this.date.getTime() : '';
                 this.$emit('update', date);
+            },
+
+            dateTime() {
+                this.init();
             }
         },
 
         methods: {
             init() {
-                this.date = this.mode === 'time' ? new Date() : '';
+                if (this.dateTime) {
+                    this.date = new Date(this.dateTime);
+                } else {
+                    this.date = this.mode === 'time' ? new Date() : '';
+                }
             },
 
             subscribeToEvents() {

@@ -262,6 +262,7 @@
 
             clearNews() {
                 this.news.title = '';
+                this.emitter.emit('clearContent');
                 this.emitter.emit('clearImage');
                 this.isUpdate = false;
             },
@@ -273,6 +274,7 @@
             updateNews(id) {
                 const selectedNews = this.allNews.find((news) => news.id === id);
                 this.news = { ...selectedNews };
+                this.news.file = '';
                 this.emitter.emit('updateContent', this.news.content);
                 this.emitter.emit('updateImage', this.news.image);
                 this.isUpdate = true;
