@@ -5,7 +5,7 @@
                 <div class="races__cropper">
                     <app-upload-cropper
                         :label="'Флаг Гран-прі'"
-                        :aspect-ratio="37/30"
+                        :aspect-ratio="3/2"
                         @update="updateRaceImage"
                     />
                 </div>
@@ -166,7 +166,6 @@
 
         methods: {
             getAllRaces() {
-                this.races = [];
                 this.isLoaded = true;
 
                 const dbRef = dRef(getDatabase());
@@ -183,6 +182,8 @@
                             });
 
                             this.selectedRace = this.races[0];
+                        } else {
+                            this.races = [];
                         }
                     })
                     .finally(() => {

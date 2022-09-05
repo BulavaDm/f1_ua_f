@@ -1,14 +1,18 @@
 <template>
     <div class="input">
-        <div class="input__label">
+        <div v-if="showLabel" class="input__label">
             {{ label }}
         </div>
-        <div class="input__entry">
+        <div class="input__entry"
+             :class="{
+                'input__entry--is-disabled': isDisabled
+             }"
+        >
             <input
                 :value="modelValue"
                 :type="type"
                 :placeholder="placeHolder"
-                @input="$emit('update:modelValue', $event.target.value)"
+                @input="handlerOnChange"
             >
         </div>
     </div>
@@ -29,15 +33,32 @@
             },
             label: {
                 type: String,
-                required: true
+                default: ''
             },
             placeHolder: {
                 type: String,
                 default: ''
+            },
+            isDisabled: {
+                type: Boolean,
+                default: false
             }
         },
 
-        emits: ['update:modelValue']
+        emits: ['update:modelValue'],
+
+        computed: {
+            showLabel() {
+                return !!this.label;
+            }
+        },
+
+        methods: {
+            handlerOnChange(event) {
+                const value = event.target.value;
+                this.$emit('update:modelValue', value)
+            }
+        }
     }
 </script>
 
@@ -65,6 +86,12 @@
                 font-size: 12px;
                 font-style: italic;
                 color: var(--app-base-secondary);
+            }
+
+            &--is-disabled {
+                input {
+                    pointer-events: none;
+                }
             }
         }
     }

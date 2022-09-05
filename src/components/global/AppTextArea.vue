@@ -5,7 +5,7 @@
         </div>
         <textarea
            :value="modelValue"
-           @input="$emit('update:modelValue', $event.target.value)"
+           @input="handlerOnChange"
         />
     </div>
 </template>
@@ -25,7 +25,14 @@
             }
         },
 
-        emits: ['update:modelValue']
+        emits: ['update:modelValue'],
+
+        methods: {
+            handlerOnChange(event) {
+                const value = event.target.value;
+                this.$emit('update:modelValue', value)
+            }
+        }
     }
 </script>
 

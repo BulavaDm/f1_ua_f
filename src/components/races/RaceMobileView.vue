@@ -75,7 +75,7 @@
 
         &__image {
             height: 60px;
-            width: 74px;
+            width: 90px;
             margin-right: 10px;
 
             img {

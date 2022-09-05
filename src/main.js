@@ -8,6 +8,7 @@ import mitt from 'mitt'
 const emitter = mitt()
 
 import AppBaseInput from "./components/global/AppBaseInput";
+import AppBaseSelect from "./components/global/AppBaseSelect";
 import AppControlBtn from "./components/global/AppControlBtn";
 import AppTextBtn from "./components/global/AppTextBtn";
 import AppTextArea from "./components/global/AppTextArea";
@@ -19,6 +20,7 @@ const app = createApp(App)
 app.config.globalProperties.emitter = emitter
 
 app.component('app-base-input', AppBaseInput);
+app.component('app-base-select', AppBaseSelect);
 app.component('app-control-btn', AppControlBtn);
 app.component('app-text-btn', AppTextBtn);
 app.component('app-text-area', AppTextArea);

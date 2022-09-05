@@ -1,31 +1,30 @@
 <template>
-    <div class="race-card">
-        <div class="race-card__info">
-            <div class="race-card__image">
-                <img :src="image" alt="Image"/>
-            </div>
-            <div class="race-card__details">
-                <div class="race-card__date">
-                    {{ date }}
-                </div>
-                <div class="race-card__name">
+    <div class="driver-card">
+        <div class="driver-card__info">
+            <div class="driver-card__details">
+                <div class="driver-card__name">
                     {{ name }}
                 </div>
+                <div class="driver-card__team">
+                    {{ team }}
+                </div>
+            </div>
+
+            <div class="driver-card__points">
+                <app-base-input
+                    v-model="total"
+                />
             </div>
         </div>
-        <div class="race-card__control">
-            <app-text-btn
-                :text="'Переглянути'"
-                @action="selectRace"
-            />
-            <div class="race-card__update">
+        <div class="driver-card__control">
+            <div class="driver-card__update">
                 <app-text-btn
                     :text="'Редагувати'"
-                    @action="updateRace"
+                    @action="updateDriver"
                 />
                 <app-text-btn
                     :text="'Видалити'"
-                    @action="deleteRace"
+                    @action="deleteDriver"
                 />
             </div>
         </div>
@@ -34,7 +33,7 @@
 
 <script>
     export default {
-        name: "RaceCard",
+        name: "DriverCard",
 
         props: {
             id: {
@@ -45,26 +44,42 @@
                 type: String,
                 required: true
             },
-            date: {
+            team: {
                 type: String,
                 required: true
             },
-            image: {
-                type: String,
+            points: {
+                type: Number,
                 required: true
             }
         },
 
+        data() {
+            return {
+                total: 0
+            }
+        },
+
+        created() {
+            this.init();
+        },
+
+        watch: {
+            total() {
+                this.$emit('updatePoints', this.id, this.total);
+            }
+        },
+
         methods: {
-            deleteRace() {
+            init() {
+                this.total = this.points;
+            },
+
+            deleteDriver() {
                 this.$emit('delete', this.id);
             },
 
-            selectRace() {
-                this.$emit('select', this.id);
-            },
-
-            updateRace() {
+            updateDriver() {
                 this.$emit('update', this.id);
             }
         }
@@ -72,7 +87,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .race-card {
+    .driver-card {
         display: flex;
         flex-direction: column;
         border: 1px solid #000000;
@@ -81,44 +96,34 @@
 
         &__info {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
+            justify-content: space-between;
             margin-bottom: 10px;
             background: #C1CFEA;
             border-radius: 10px 10px 0 0;
-        }
-
-        &__image {
-            height: 50px;
-            min-width: 75px;
-            margin-right: 10px;
-
-            img {
-                height: 50px;
-                width: 100%;
-                max-width: 100%;
-                object-fit: cover;
-                border-radius: 10px 0 0 0 ;
-            }
+            padding: 10px;
         }
 
         &__details {
             display: flex;
             flex-direction: column;
-            background: #C1CFEA;
         }
 
-        &__date {
+        &__name {
             margin-bottom: 4px;
         }
 
-        &__date, &__name {
-            font-size: 16px;
-            line-height: 16px;
+        &__team {
+            font-size: 14px;
+        }
+
+        &__points {
+            max-width: 60px;
         }
 
         &__control {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             padding: 10px;
         }
 

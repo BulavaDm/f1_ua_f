@@ -10,10 +10,12 @@
     "core-js": "^3.6.5",
     "firebase": "^9.9.0",
     "lodash.clonedeep": "^4.5.0",
+    "lodash.sortby": "^4.7.0",
     "mitt": "^2.1.0",
     "v-calendar": "^3.0.0-alpha.8",
     "vue": "^3.0.0",
     "vue-advanced-cropper": "^2.8.3",
+    "vue-multiselect": "^3.0.0-alpha.2",
     "vue-router": "^4.0.0-0",
     "vue3-editor": "^0.1.1"
   },

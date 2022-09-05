@@ -5,6 +5,7 @@
         </div>
         <date-picker class="date-picker__picker"
             v-model="date"
+            :locale="langCode"
             :mode="mode"
             :masks="masks"
             :is24hr="true"
@@ -52,7 +53,8 @@
 
         data() {
             return {
-                date: ''
+                date: '',
+                langCode: 'uk'
             }
         },
 

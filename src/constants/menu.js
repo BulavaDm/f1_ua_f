@@ -11,7 +11,7 @@ const menuItems = [
     },
     {
         id: '3',
-        name: 'Результати',
+        name: 'Учасники',
         route: '/standings'
     }
 ]

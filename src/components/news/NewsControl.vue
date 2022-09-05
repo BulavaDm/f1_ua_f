@@ -110,7 +110,7 @@
                 isLoaded: false,
                 isUpdate: false,
 
-                allNews: null,
+                allNews: [],
 
                 maxHeight: {
                     list: '',
@@ -135,7 +135,6 @@
 
         methods: {
             getAllNews() {
-                this.allNews = [];
                 this.isLoaded = true;
 
                 const dbRef = dRef(getDatabase());
@@ -152,6 +151,8 @@
                             });
 
                             this.selectedNews = this.allNews[0];
+                        } else {
+                            this.allNews = [];
                         }
                     })
                     .finally(() => {
